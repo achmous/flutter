@@ -14,7 +14,22 @@ class GitUsersPage extends StatelessWidget {
     return Scaffold(
 
       appBar: AppBar(
-        title: const Text("Git Users"),
+        title: BlocBuilder<UsersBloc, UsersState>(
+
+          builder:  (context, state) {
+
+            if(state is SearchUsersErrorState)
+              return Row(
+                mainAxisAlignment:  MainAxisAlignment.spaceBetween,
+               children: [
+                 Text("users"),
+                 Text("${state.currentPage}/${state.totalePages}")
+               ],
+              );
+            else
+              return const Text("Users page");
+          },
+        ),
 
       ),
       body: Column(
@@ -46,7 +61,6 @@ class GitUsersPage extends StatelessWidget {
           BlocBuilder<UsersBloc, UsersState>(builder: (context, state) {
             if (state is SearchUsersIsLoadingState)
               return const Center(
-
                 child: CircularProgressIndicator(),
               );
             else if (state is SearchUsersErrorState) {
@@ -62,7 +76,7 @@ class GitUsersPage extends StatelessWidget {
              onEndOfPage: () => {
 
 
-               context.read<UsersBloc>().add(NextPage(key: state.key, currentPage: state.currentPage+1, pageSize: state.pageSize +1))
+               context.read<UsersBloc>().add(NextPageEvent(key: state.key, currentPage: state.currentPage+1, pageSize: state.pageSize +1,totalePages: state.totalePages ))
 
               },
 
@@ -75,14 +89,14 @@ class GitUsersPage extends StatelessWidget {
                       children: [
 
                         CircleAvatar(
-                          backgroundImage: NetworkImage(state.list.items[index].avatarUrl) ,
+                          backgroundImage: NetworkImage(state.users[index].avatarUrl) ,
                           radius : 40,
 
                         ),
                         const SizedBox(
                           width: 5,
                         ),
-                        Text(state.list.items[index].login )
+                        Text(state.users[index].login )
 
                       ],
                     ),
@@ -91,7 +105,7 @@ class GitUsersPage extends StatelessWidget {
                       Divider(
                         height: 2,
                       ),
-                  itemCount: state.list.items.length)
+                  itemCount: state.users.length)
               )
               );
             }else{
