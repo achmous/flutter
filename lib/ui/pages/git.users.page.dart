@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:github_users_bloc/bloc/users.bloc.dart';
-import 'package:github_users_bloc/ui/widgets/main.drawer.widget.dart';
+import 'package:github_users_bloc/ui/pages/repositories.page.dart';
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
 
 class GitUsersPage extends StatelessWidget {
@@ -21,10 +21,10 @@ class GitUsersPage extends StatelessWidget {
             if(state is SearchUsersErrorState)
               return Row(
                 mainAxisAlignment:  MainAxisAlignment.spaceBetween,
-               children: [
-                 Text("users"),
-                 Text("${state.currentPage}/${state.totalePages}")
-               ],
+                children: [
+                  Text("users"),
+                  Text("${state.currentPage}/${state.totalePages}")
+                ],
               );
             else
               return const Text("Users page");
@@ -67,55 +67,60 @@ class GitUsersPage extends StatelessWidget {
               return Column(
                 children: [
                   Text(
-                    state.error, style: TextStyle(color: Colors.deepOrange),),
+                    state.error, style: TextStyle(color:Theme.of(context).primaryColor),),
                   ElevatedButton(onPressed: () {}, child: const Text('Retry'))
                 ],
               );
             } else if (state is SearchUsersSuccessState) {
               return Expanded(child:LazyLoadScrollView(
-             onEndOfPage: () => {
+                  onEndOfPage: () => {
 
 
-               context.read<UsersBloc>().add(NextPageEvent(key: state.key, currentPage: state.currentPage+1, pageSize: state.pageSize +1,totalePages: state.totalePages ))
+                    context.read<UsersBloc>().add(NextPageEvent(key: state.key, currentPage: state.currentPage+1, pageSize: state.pageSize ,totalePages: state.totalePages ))
 
-              },
+                  },
 
 
 
-               child: ListView.separated(
+                  child: ListView.separated(
 
-                  itemBuilder: (context, index)=>ListTile(
-                    title: Row(
-                      children: [
+                      itemBuilder: (context, index)=>ListTile(
+                        onTap:() {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => GitRepositoriesPage(
+                                      state.users[index].login,state.users[index].avatarUrl)));
+                        },
+                        title: Row(
+                          children: [
 
-                        CircleAvatar(
-                          backgroundImage: NetworkImage(state.users[index].avatarUrl) ,
-                          radius : 40,
+                            CircleAvatar(
+                              backgroundImage: NetworkImage(state.users[index].avatarUrl) ,
+                              radius : 40,
 
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text(state.users[index].login )
+
+                          ],
                         ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(state.users[index].login )
-
-                      ],
-                    ),
-                  ) ,
-                  separatorBuilder: (contex,index) =>
-                      Divider(
-                        height: 2,
-                      ),
-                  itemCount: state.users.length)
+                      ) ,
+                      separatorBuilder: (contex,index) =>
+                          Divider(
+                            height: 2,
+                          ),
+                      itemCount: state.users.length)
               )
               );
             }else{
               return Container(
-                color: Colors.deepOrange,
+                color: Theme.of(context).primaryColor,
               );
             }
           })
-
-
         ],
       ),
     );

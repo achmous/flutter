@@ -32,7 +32,7 @@ class CounterErrorState extends CounterState{
 
 }
 class CounterInitialState extends CounterState{
-  CounterInitialState({super.counter: 0});
+  CounterInitialState():super(counter: 0);
 
 
 
@@ -40,15 +40,8 @@ class CounterInitialState extends CounterState{
 //BLOC
 class CounterBloc extends Bloc<CounterEvent,CounterState>{
 
-  CounterBloc( ):super(CounterInitialState()) {
+   CounterBloc( ):super(CounterInitialState()) {
 
-    // if(state.counter<10){
-    //   int  counterValue= state.counter+1;
-    //   emit(CounterSuccessState(counter:counterValue));
-    // }
-    // else{
-    //   emit(CounterErrorState(counter: state.counter, errorMessage: 'Error'))
-    // }
     on((IncrementCounter event,emit)  {
       if(state.counter<10){
         int  counterValue= state.counter+1;
@@ -58,7 +51,7 @@ class CounterBloc extends Bloc<CounterEvent,CounterState>{
         emit(CounterErrorState(counter: state.counter, errorMessage: 'Counter value cannot exceed 10'));
       }
     });
-    on((IncrementCounter event,emit)  {
+    on((DecrementCounter event,emit)  {
       if(state.counter>0){
         int  counterValue= state.counter-1;
         emit(CounterSuccessState(counter:counterValue));
